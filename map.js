@@ -145,20 +145,20 @@ function setupEventListeners() {
 function setupPhotoMarkersToggle() {
   console.log("Setting up photo markers toggle...")
 
-  const toggle = document.getElementById("photo-markers-toggle")
-  if (toggle) {
+  const checkbox = document.getElementById("photo-markers-checkbox")
+  if (checkbox) {
     // Remove any existing event listeners
-    toggle.removeEventListener("change", handleToggleChange)
+    checkbox.removeEventListener("change", handleToggleChange)
 
     // Add new event listener
-    toggle.addEventListener("change", handleToggleChange)
+    checkbox.addEventListener("change", handleToggleChange)
 
     // Set initial state
-    toggle.checked = showPhotoMarkers
+    checkbox.checked = showPhotoMarkers
 
-    console.log("Photo markers toggle set up successfully")
+    console.log("Photo markers toggle set up successfully. Initial state:", checkbox.checked)
   } else {
-    console.error("Photo markers toggle element not found!")
+    console.error("Photo markers checkbox element not found!")
   }
 }
 
@@ -256,26 +256,35 @@ function changeBaseLayer(layerId) {
 }
 
 function togglePhotoMarkers(show) {
-  console.log("Toggling photo markers:", show)
+  console.log("Toggling photo markers:", show, "Markers available:", !!markers, "Map available:", !!map)
 
   if (!markers || !map) {
     console.error("Markers or map not available")
     return
   }
 
-  if (show) {
-    if (!map.hasLayer(markers)) {
-      map.addLayer(markers)
-      console.log("Photo markers shown")
+  try {
+    if (show) {
+      if (!map.hasLayer(markers)) {
+        map.addLayer(markers)
+        console.log("Photo markers added to map")
+      } else {
+        console.log("Photo markers already on map")
+      }
+    } else {
+      if (map.hasLayer(markers)) {
+        map.removeLayer(markers)
+        console.log("Photo markers removed from map")
+      } else {
+        console.log("Photo markers already removed from map")
+      }
     }
-  } else {
-    if (map.hasLayer(markers)) {
-      map.removeLayer(markers)
-      console.log("Photo markers hidden")
-    }
-  }
 
-  showPhotoMarkers = show
+    showPhotoMarkers = show
+    console.log("Toggle completed successfully")
+  } catch (error) {
+    console.error("Error toggling photo markers:", error)
+  }
 }
 
 function resetMapView() {
@@ -371,6 +380,7 @@ function loadPhotoData() {
       // Add markers to map
       if (map && markers) {
         map.addLayer(markers)
+        console.log("Markers added to map")
       }
 
       updatePhotoCount()
