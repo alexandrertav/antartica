@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebMapa - Ilha Rei George</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.awesome-markers@2.0.5/dist/leaflet.awesome-markers.css">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-card">
+            <div class="loading-content">
+                <div class="loading-spinner"></div>
+                <div>
+                    <p class="loading-title">Carregando WebMapa</p>
+                    <p class="loading-subtitle">Ilha Rei George, Antártica</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Menu Bar -->
+    <div class="top-menu-bar">
+        <div class="menu-container">
+            <!-- Logo/Title -->
+            <div class="logo-section">
+                <div class="logo-container">
+                    <div class="logo-icon">
+                        <i data-lucide="map"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>WebMapa</h1>
+                        <p>Ilha Rei George</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Menu Items -->
+            <div class="menu-items">
+                <button class="menu-btn" data-action="home" title="Início">
+                    <i data-lucide="home"></i>
+                    <span>Início</span>
+                </button>
+                <button class="menu-btn" data-action="zoom-in" title="Aproximar">
+                    <i data-lucide="zoom-in"></i>
+                    <span>Aproximar</span>
+                </button>
+                <button class="menu-btn" data-action="zoom-out" title="Afastar">
+                    <i data-lucide="zoom-out"></i>
+                    <span>Afastar</span>
+                </button>
+                <button class="menu-btn" data-panel="layers" title="Camadas">
+                    <i data-lucide="layers"></i>
+                    <span>Camadas</span>
+                </button>
+                <button class="menu-btn" data-panel="search" title="Buscar">
+                    <i data-lucide="search"></i>
+                    <span>Buscar</span>
+                </button>
+                <button class="menu-btn" data-panel="measure" title="Medir">
+                    <i data-lucide="ruler"></i>
+                    <span>Medir</span>
+                </button>
+                <button class="menu-btn" data-action="fullscreen" title="Tela Cheia">
+                    <i data-lucide="maximize"></i>
+                    <span>Tela Cheia</span>
+                </button>
+                <button class="menu-btn" data-panel="export" title="Exportar">
+                    <i data-lucide="download"></i>
+                    <span>Exportar</span>
+                </button>
+                <button class="menu-btn" data-panel="share" title="Compartilhar">
+                    <i data-lucide="share-2"></i>
+                    <span>Compartilhar</span>
+                </button>
+                <button class="menu-btn" data-panel="info" title="Informações">
+                    <i data-lucide="info"></i>
+                    <span>Informações</span>
+                </button>
+            </div>
+
+            <!-- Status Info -->
+            <div class="status-section">
+                <div class="status-item">
+                    <i data-lucide="camera"></i>
+                    <span id="photo-count">0 fotos</span>
+                </div>
+                <div class="status-item">
+                    <div class="status-indicator" id="status-indicator"></div>
+                    <span id="status-text">Carregando...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Map Container -->
+    <div id="map"></div>
+
+    <!-- Panels -->
+    <div id="layers-panel" class="panel" style="display: none;">
+        <div class="panel-card">
+            <div class="panel-content">
+                <h3>Gerenciar Camadas</h3>
+                
+                <div class="panel-section">
+                    <h4>Camadas Base</h4>
+                    <div class="base-layers-grid">
+                        <button class="layer-btn active" data-layer="osm">
+                            <i data-lucide="map"></i>
+                            <span>OpenStreetMap</span>
+                        </button>
+                        <button class="layer-btn" data-layer="satellite">
+                            <i data-lucide="satellite"></i>
+                            <span>Satellite</span>
+                        </button>
+                        <button class="layer-btn" data-layer="terrain">
+                            <i data-lucide="mountain"></i>
+                            <span>Terrain</span>
+                        </button>
+                        <button class="layer-btn" data-layer="cartodb">
+                            <i data-lucide="globe"></i>
+                            <span>Light Theme</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="panel-separator"></div>
+
+                <div class="panel-section">
+                    <h4>Camadas de Dados</h4>
+                    <div class="layer-toggle">
+                        <label for="photo-markers-toggle">Marcadores de Fotos (<span id="marker-count">0</span>)</label>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="photo-markers-toggle" checked>
+                            <label for="photo-markers-toggle" class="toggle-label">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="search-panel" class="panel" style="display: none;">
+        <div class="panel-card">
+            <div class="panel-content">
+                <h3>Buscar no Mapa</h3>
+                <div class="search-section">
+                    <input type="text" id="search-input" placeholder="Buscar por observador, ano, tipo...">
+                    <button class="search-btn">
+                        <i data-lucide="search"></i>
+                        Buscar
+                    </button>
+                </div>
+                <div class="search-help">
+                    <p>Busque por:</p>
+                    <ul>
+                        <li>Nome do observador</li>
+                        <li>Ano da coleta</li>
+                        <li>Tipo de amostra</li>
+                        <li>Coordenadas</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="measure-panel" class="panel" style="display: none;">
+        <div class="panel-card">
+            <div class="panel-content">
+                <h3>Ferramentas de Medição</h3>
+                <div class="measure-tools">
+                    <button class="tool-btn">
+                        <i data-lucide="ruler"></i>
+                        Distância
+                    </button>
+                    <button class="tool-btn">
+                        <i data-lucide="map-pin"></i>
+                        Área
+                    </button>
+                </div>
+                <div class="tool-help">
+                    <p>Clique no mapa para começar a medir distâncias ou áreas.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="export-panel" class="panel" style="display: none;">
+        <div class="panel-card">
+            <div class="panel-content">
+                <h3>Exportar Dados</h3>
+                <div class="export-options">
+                    <button class="export-btn">
+                        <i data-lucide="download"></i>
+                        Exportar como PNG
+                    </button>
+                    <button class="export-btn">
+                        <i data-lucide="download"></i>
+                        Exportar como PDF
+                    </button>
+                    <button class="export-btn">
+                        <i data-lucide="download"></i>
+                        Exportar dados CSV
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="share-panel" class="panel" style="display: none;">
+        <div class="panel-card">
+            <div class="panel-content">
+                <h3>Compartilhar Mapa</h3>
+                <div class="share-options">
+                    <button class="share-btn">
+                        <i data-lucide="share-2"></i>
+                        Copiar Link
+                    </button>
+                    <button class="share-btn">
+                        <i data-lucide="share-2"></i>
+                        Incorporar Mapa
+                    </button>
+                </div>
+                <div class="share-help">
+                    <p>Compartilhe este mapa com outros pesquisadores ou incorpore em seu site.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="info-panel" class="panel" style="display: none;">
+        <div class="panel-card">
+            <div class="panel-content">
+                <h3>Informações do Projeto</h3>
+                <div class="info-sections">
+                    <div class="info-item">
+                        <h4>Localização</h4>
+                        <p>Ilha Rei George, Antártica</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>Dados</h4>
+                        <p><span id="info-photo-count">0</span> fotos georreferenciadas</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>Coordenadas</h4>
+                        <p>62°S, 58°W</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>Sobre</h4>
+                        <p>Mapa interativo com dados de pesquisa científica coletados na Ilha Rei George, parte do arquipélago das Ilhas Shetland do Sul na Antártica.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet.awesome-markers@2.0.5/dist/leaflet.awesome-markers.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <script src="https://unpkg.com/leaflet-fullscreen/dist/Leaflet.fullscreen.min.js"></script>
+    <script src="map.js"></script>
+</body>
+</html>
