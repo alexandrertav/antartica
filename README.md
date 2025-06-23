@@ -7,3 +7,5 @@ Durante o processo de pesquisa e levantamento de dados, identificou-se a  possib
 
 A partir disso surgiu a intenção de usar os dados na elaboração de um mapa interativo (web mapa), possibilitando a visualização e a exploração das informações geoespaciais da Antártica. Começamos a conceber o mapa interativo, permitindo não apenas a exibição de dados espaciais, mas também funcionalidades avançadas como filtragem de dados, interação com diferentes camadas de informação, zoom e movimentação no mapa. Com o avanço do desenvolvimento, é possível o surgimento de novas ideias para aprimorar a experiência do usuário e garantir que os dados sejam facilmente acessíveis e interpretáveis.
 
+
+[Uploading Engenharia de Software - Projeto.pdf…]()
