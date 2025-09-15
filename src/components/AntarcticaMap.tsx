@@ -1,22 +1,7 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-import { 
-  Map, 
-  Home, 
-  ZoomIn, 
-  ZoomOut, 
-  Layers, 
-  Search, 
-  Maximize, 
-  Download, 
-  Share2, 
-  Info,
-  Camera,
-  Satellite,
-  Mountain,
-  Globe
-} from 'lucide-react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+// Icons are used in AntarcticaGlassPanel and AntarcticaGlassMenu components
 import { AntarcticaGlassMenu } from './AntarcticaGlassMenu'
 import { LayersPanel, SearchPanel, ExportPanel, InfoPanel } from './AntarcticaGlassPanel'
 
@@ -65,8 +50,8 @@ const baseLayerOptions: Record<string, BaseLayer> = {
 
 export default function AntarcticaMap() {
   const mapRef = useRef<HTMLDivElement>(null)
-  const [map, setMap] = useState<any>(null)
-  const [markers, setMarkers] = useState<any>(null)
+  const [map, setMap] = useState<L.Map | null>(null)
+  const [markers, setMarkers] = useState<L.LayerGroup | null>(null)
   const [currentBaseLayer, setCurrentBaseLayer] = useState('osm')
   const [showPhotoMarkers, setShowPhotoMarkers] = useState(true)
   const [activePanel, setActivePanel] = useState<string | null>(null)
@@ -75,24 +60,7 @@ export default function AntarcticaMap() {
   const [isLoading, setIsLoading] = useState(true)
   const [isMapInitialized, setIsMapInitialized] = useState(false)
 
-  useEffect(() => {
-    if (typeof window !== 'undefined' && mapRef.current && !isMapInitialized) {
-      initializeMap()
-    }
-  }, [isMapInitialized])
-
-  useEffect(() => {
-    return () => {
-      // Cleanup map instance on component unmount
-      if (map) {
-        map.remove()
-        setMap(null)
-        setIsMapInitialized(false)
-      }
-    }
-  }, [])
-
-  const initializeMap = async () => {
+  const initializeMap = useCallback(async () => {
     if (isMapInitialized || !mapRef.current) return
 
     try {
@@ -118,7 +86,7 @@ export default function AntarcticaMap() {
       }).setView([-62.1, -58.4], 10)
 
       // Add initial base layer
-      const initialLayer = L.tileLayer(baseLayerOptions.osm.url, {
+      L.tileLayer(baseLayerOptions.osm.url, {
         attribution: baseLayerOptions.osm.attribution,
       }).addTo(mapInstance)
 
@@ -126,8 +94,7 @@ export default function AntarcticaMap() {
       setIsMapInitialized(true)
 
       // Initialize marker cluster group
-      // Load MarkerCluster script dynamically after Leaflet is ready
-      let clusterGroup
+      let clusterGroup: L.LayerGroup
       try {
         // Load MarkerCluster script if not already loaded
         if (!(window as any).L.MarkerClusterGroup) {
@@ -139,7 +106,7 @@ export default function AntarcticaMap() {
               console.log('MarkerCluster script loaded')
               resolve()
             }
-            script.onerror = (error) => {
+            script.onerror = (error: any) => {
               console.error('Failed to load MarkerCluster script:', error)
               reject(error)
             }
@@ -147,7 +114,7 @@ export default function AntarcticaMap() {
           })
         }
 
-        // Now create the cluster group
+        // Create cluster group
         if ((window as any).L && (window as any).L.MarkerClusterGroup) {
           clusterGroup = new (window as any).L.MarkerClusterGroup({
             chunkedLoading: true,
@@ -157,7 +124,6 @@ export default function AntarcticaMap() {
             spiderfyOnMaxZoom: true,
             showCoverageOnHover: false,
             zoomToBoundsOnClick: true,
-            // Disable clustering at zoom level 16+ (approximately 1:25,000 scale)
             disableClusteringAtZoom: 16,
             iconCreateFunction: function(cluster: any) {
               const count = cluster.getChildCount()
@@ -178,19 +144,6 @@ export default function AntarcticaMap() {
               })
             }
           })
-          console.log('MarkerCluster initialized successfully with clustering disabled at zoom 16+ (1:25,000 scale)')
-          
-          // Add zoom event listener to show current scale info
-          mapInstance.on('zoomend', function() {
-            const zoom = mapInstance.getZoom()
-            const scale = Math.round(591657527.591555 / Math.pow(2, zoom))
-            console.log(`Current zoom: ${zoom}, Approximate scale: 1:${scale.toLocaleString()}`)
-            if (zoom >= 16) {
-              console.log('Clustering disabled - showing individual markers')
-            } else {
-              console.log('Clustering active')
-            }
-          })
         } else {
           throw new Error('MarkerCluster still not available after loading script')
         }
@@ -209,9 +162,26 @@ export default function AntarcticaMap() {
       console.error('Error initializing map:', error)
       setIsLoading(false)
     }
-  }
+  }, [isMapInitialized])
 
-  const loadPhotoData = async (mapInstance: any, layerGroup: any) => {
+  useEffect(() => {
+    if (typeof window !== 'undefined' && mapRef.current && !isMapInitialized) {
+      initializeMap()
+    }
+  }, [initializeMap, isMapInitialized])
+
+  useEffect(() => {
+    return () => {
+      // Cleanup map instance on component unmount
+      if (map) {
+        map.remove()
+        setMap(null)
+        setIsMapInitialized(false)
+      }
+    }
+  }, [map])
+
+  const loadPhotoData = async (mapInstance: L.Map, layerGroup: L.LayerGroup) => {
     try {
       console.log('Starting to load photo data...')
       console.log('Fetching from:', window.location.origin + '/fotos.csv')
@@ -323,7 +293,6 @@ export default function AntarcticaMap() {
                 ${row.URL ? `<a href="${row.URL}" target="_blank" style="color: #007cba; text-decoration: none;">📷 Ver foto original</a>` : ''}
               </div>
             `
-
             // Create custom camera icon for photo markers
             const cameraIcon = L.divIcon({
               html: `
@@ -421,7 +390,7 @@ export default function AntarcticaMap() {
     const L = (await import('leaflet')).default
     
     // Remove all existing tile layers
-    map.eachLayer((layer: any) => {
+    map.eachLayer((layer: L.Layer) => {
       if (layer instanceof L.TileLayer) {
         map.removeLayer(layer)
       }

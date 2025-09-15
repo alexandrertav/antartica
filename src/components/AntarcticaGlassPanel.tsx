@@ -46,7 +46,7 @@ interface InfoPanelProps extends Omit<PanelProps, 'children'> {
 function GlassPanel({ title, children, onClose, className }: PanelProps) {
   return (
     <div className={cn(
-      "absolute top-6 left-32 z-30 w-80",
+      "absolute top-6 left-48 z-30 w-80",
       "bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl rounded-2xl",
       "animate-in slide-in-from-left-2 duration-300",
       className
