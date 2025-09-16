@@ -68,7 +68,7 @@ export default function AntarcticaMap() {
       const L = (await import('leaflet')).default
       
       // Fix for default markers
-      delete (L.Icon.Default.prototype as any)._getIconUrl
+      delete (L.Icon.Default.prototype as unknown as { _getIconUrl?: unknown })._getIconUrl
       L.Icon.Default.mergeOptions({
         iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
         iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
@@ -76,7 +76,7 @@ export default function AntarcticaMap() {
       })
 
       // Check if container already has a map
-      if ((mapRef.current as any)._leaflet_id) {
+      if ((mapRef.current as HTMLElement & { _leaflet_id?: number })._leaflet_id) {
         return
       }
 
@@ -97,7 +97,7 @@ export default function AntarcticaMap() {
       let clusterGroup: L.LayerGroup
       try {
         // Load MarkerCluster script if not already loaded
-        if (!(window as any).L.MarkerClusterGroup) {
+        if (!(window as typeof window & { L?: { MarkerClusterGroup?: unknown } }).L?.MarkerClusterGroup) {
           console.log('Loading MarkerCluster script...')
           await new Promise<void>((resolve, reject) => {
             const script = document.createElement('script')
@@ -106,7 +106,7 @@ export default function AntarcticaMap() {
               console.log('MarkerCluster script loaded')
               resolve()
             }
-            script.onerror = (error: any) => {
+            script.onerror = (error: Event | string) => {
               console.error('Failed to load MarkerCluster script:', error)
               reject(error)
             }
@@ -115,8 +115,9 @@ export default function AntarcticaMap() {
         }
 
         // Create cluster group
-        if ((window as any).L && (window as any).L.MarkerClusterGroup) {
-          clusterGroup = new (window as any).L.MarkerClusterGroup({
+        const windowWithLeaflet = window as typeof window & { L?: { MarkerClusterGroup?: new (options: unknown) => L.LayerGroup } }
+        if (windowWithLeaflet.L?.MarkerClusterGroup) {
+          clusterGroup = new windowWithLeaflet.L.MarkerClusterGroup({
             chunkedLoading: true,
             chunkInterval: 200,
             chunkDelay: 50,
@@ -125,7 +126,7 @@ export default function AntarcticaMap() {
             showCoverageOnHover: false,
             zoomToBoundsOnClick: true,
             disableClusteringAtZoom: 16,
-            iconCreateFunction: function(cluster: any) {
+            iconCreateFunction: function(cluster: { getChildCount: () => number }) {
               const count = cluster.getChildCount()
               let className = 'marker-cluster-small'
               
@@ -235,11 +236,11 @@ export default function AntarcticaMap() {
           }
           values.push(current.trim()) // Add the last value
           
-          const row: any = {}
+          const row: Record<string, string> = {}
           headers.forEach((header, index) => {
             row[header] = values[index]?.replace(/"/g, '') || ''
           })
-          data.push(row)
+          data.push(row as unknown as PhotoData)
         }
       }
 
@@ -397,7 +398,7 @@ export default function AntarcticaMap() {
     })
 
     // Add new base layer
-    const newLayer = L.tileLayer(baseLayerOptions[layerId].url, {
+    L.tileLayer(baseLayerOptions[layerId].url, {
       attribution: baseLayerOptions[layerId].attribution,
     }).addTo(map)
 

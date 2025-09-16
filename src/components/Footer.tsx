@@ -112,7 +112,7 @@ export default function Footer() {
             {/* Copyright */}
             <div className="text-gray-400 text-sm">
               <p>© 2024 Instituto Federal de Educação, Ciência e Tecnologia do Rio Grande do Sul (IFRS)</p>
-              <p className="mt-1">Projeto de pesquisa: "Avaliação e gestão de dados geomorfológicos da Ilha Rei George, Antártica Marítima"</p>
+              <p className="mt-1">Projeto de pesquisa: Avaliação e gestão de dados geomorfológicos da Ilha Rei George, Antártica Marítima</p>
             </div>
 
             {/* Made with love */}

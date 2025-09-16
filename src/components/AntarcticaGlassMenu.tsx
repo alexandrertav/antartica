@@ -30,7 +30,7 @@ interface StatusIndicatorProps {
   variant?: 'info' | 'success' | 'warning'
 }
 
-function MenuButton({ icon: Icon, title, onClick, isActive = false, variant = 'primary' }: MenuButtonProps) {
+function MenuButton({ icon: Icon, title, onClick, isActive = false }: MenuButtonProps) {
   return (
     <button
       onClick={onClick}
@@ -109,13 +109,11 @@ export function AntarcticaGlassMenu({ onMenuClick, activePanel, photoCount, isLo
               icon={ZoomIn}
               title="Aproximar"
               onClick={() => onMenuClick('zoom-in')}
-              variant="secondary"
             />
             <MenuButton
               icon={ZoomOut}
               title="Afastar"
               onClick={() => onMenuClick('zoom-out')}
-              variant="secondary"
             />
           </div>
 

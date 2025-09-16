@@ -115,7 +115,7 @@ export default function Hero() {
                   <Users className="w-6 h-6 text-white" />
                 </div>
                 <div className="text-3xl font-bold text-slate-900 mb-1">OpenSource</div>
-                <div className="text-sm text-slate-700 font-medium">Ciência e Código Aberto</div>
+                <div className="text-sm text-slate-700 font-medium">Ciencia e Codigo Aberto</div>
               </IceGlassContainer>
             </div>
           </div>
