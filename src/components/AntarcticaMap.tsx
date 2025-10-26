@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import type * as L from 'leaflet'
 // Icons are used in AntarcticaGlassPanel and AntarcticaGlassMenu components
 import { AntarcticaGlassMenu } from './AntarcticaGlassMenu'
 import { LayersPanel, SearchPanel, ExportPanel, InfoPanel } from './AntarcticaGlassPanel'
@@ -21,38 +22,51 @@ interface PhotoData {
 
 interface BaseLayer {
   name: string
-  url: string
+  url?: string
+  geojson?: string
   attribution: string
+  type: 'tile' | 'geojson'
 }
 
 const baseLayerOptions: Record<string, BaseLayer> = {
+  coastline: {
+    name: "Linha de Costa",
+    geojson: "/camadas/costa.geojson",
+    attribution: "© IFRS - Vetorizado no QGIS",
+    type: 'geojson'
+  },
   osm: {
     name: "OpenStreetMap",
     url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
     attribution: "© OpenStreetMap contributors",
+    type: 'tile'
   },
   satellite: {
     name: "Satellite",
     url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
     attribution: "© Esri",
+    type: 'tile'
   },
   terrain: {
     name: "Terrain",
     url: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
     attribution: "© OpenTopoMap contributors",
+    type: 'tile'
   },
   cartodb: {
     name: "Light Theme",
     url: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
     attribution: "© CartoDB",
+    type: 'tile'
   },
 }
 
 export default function AntarcticaMap() {
   const mapRef = useRef<HTMLDivElement>(null)
+  const baseLayerRef = useRef<L.TileLayer | L.GeoJSON | L.LayerGroup | null>(null)
   const [map, setMap] = useState<L.Map | null>(null)
   const [markers, setMarkers] = useState<L.LayerGroup | null>(null)
-  const [currentBaseLayer, setCurrentBaseLayer] = useState('osm')
+  const [currentBaseLayer, setCurrentBaseLayer] = useState('coastline')
   const [showPhotoMarkers, setShowPhotoMarkers] = useState(true)
   const [activePanel, setActivePanel] = useState<string | null>(null)
   const [photoCount, setPhotoCount] = useState(0)
@@ -83,15 +97,15 @@ export default function AntarcticaMap() {
       // Initialize map
       const mapInstance = L.map(mapRef.current, {
         zoomControl: false,
+        minZoom: 3,
+        maxZoom: 18,
       }).setView([-62.1, -58.4], 10)
-
-      // Add initial base layer
-      L.tileLayer(baseLayerOptions.osm.url, {
-        attribution: baseLayerOptions.osm.attribution,
-      }).addTo(mapInstance)
 
       setMap(mapInstance)
       setIsMapInitialized(true)
+      
+      // Load initial base layer (coastline GeoJSON)
+      await loadBaseLayer('coastline', mapInstance, L)
 
       // Initialize marker cluster group
       let clusterGroup: L.LayerGroup
@@ -385,23 +399,102 @@ export default function AntarcticaMap() {
     setActivePanel(activePanel === panelId ? null : panelId)
   }
 
+  const loadBaseLayer = async (layerId: string, mapInstance: L.Map, LeafletLib: typeof L) => {
+    const layerConfig = baseLayerOptions[layerId]
+    if (!layerConfig) return
+
+    // Remove previous base layer if exists
+    if (baseLayerRef.current) {
+      mapInstance.removeLayer(baseLayerRef.current)
+    }
+
+    let newLayer: L.TileLayer | L.GeoJSON | L.LayerGroup
+
+    if (layerConfig.type === 'geojson' && layerConfig.geojson) {
+      // Load GeoJSON layer
+      try {
+        console.log('Loading GeoJSON base layer:', layerConfig.name)
+        const response = await fetch(layerConfig.geojson)
+        
+        if (!response.ok) {
+          throw new Error(`Failed to load GeoJSON: ${response.status}`)
+        }
+        
+        const geojsonData = await response.json()
+        
+        // Create a layer group to hold both ocean background and land polygons
+        const layerGroup = LeafletLib.layerGroup()
+        
+        // Add ocean background (icy Antarctic waters)
+        const oceanBounds = LeafletLib.latLngBounds(
+          [-63.0, -60.0],  // Southwest corner
+          [-61.0, -57.0]   // Northeast corner
+        )
+        const oceanLayer = LeafletLib.rectangle(oceanBounds, {
+          color: '#A5D8DD',      // Icy blue ocean border
+          weight: 0,             // No border
+          fillColor: ' #368DC5',  // Light icy blue for Antarctic waters
+          fillOpacity: 0.7,
+          interactive: false     // Don't capture clicks
+        })
+        oceanLayer.addTo(layerGroup)
+        
+        // Create GeoJSON layer for land (on top of ocean)
+        const landLayer = LeafletLib.geoJSON(geojsonData, {
+          style: {
+            color: '#368DC5',      // Ice blue for coastline border
+            weight: 2,
+            opacity: 0.9,
+            fillColor: '#F0F8FF',  // Alice blue - icy white for glacial land
+            fillOpacity: 0.95      // More opaque to cover ocean below
+          },
+          onEachFeature: (feature: GeoJSON.Feature, layer: L.Layer) => {
+            // Add popup with feature information
+            const popupContent = `
+              <div style="text-align:center;">
+                <strong>${layerConfig.name}</strong><br>
+                <span style="font-size: 12px; color: #64748b;">Ilha Rei George</span><br>
+                <span style="font-size: 11px; color: #94a3b8;">Vetorizado no QGIS</span>
+              </div>
+            `
+            layer.bindPopup(popupContent)
+          }
+        })
+        landLayer.addTo(layerGroup)
+        
+        newLayer = layerGroup
+        
+        console.log('GeoJSON base layer loaded successfully')
+      } catch (error) {
+        console.error('Error loading GeoJSON base layer:', error)
+        return
+      }
+    } else if (layerConfig.type === 'tile' && layerConfig.url) {
+      // Load tile layer
+      newLayer = LeafletLib.tileLayer(layerConfig.url, {
+        attribution: layerConfig.attribution,
+      })
+    } else {
+      console.error('Invalid layer configuration')
+      return
+    }
+
+    // Add new base layer and ensure it stays behind other layers
+    newLayer.addTo(mapInstance)
+    
+    // Force base layer to be rendered behind all other layers
+    if ('bringToBack' in newLayer) {
+      newLayer.bringToBack()
+    }
+    
+    baseLayerRef.current = newLayer
+  }
+
   const changeBaseLayer = async (layerId: string) => {
     if (!map || !baseLayerOptions[layerId]) return
 
-    const L = (await import('leaflet')).default
-    
-    // Remove all existing tile layers
-    map.eachLayer((layer: L.Layer) => {
-      if (layer instanceof L.TileLayer) {
-        map.removeLayer(layer)
-      }
-    })
-
-    // Add new base layer
-    L.tileLayer(baseLayerOptions[layerId].url, {
-      attribution: baseLayerOptions[layerId].attribution,
-    }).addTo(map)
-
+    const LeafletLib = (await import('leaflet')).default
+    await loadBaseLayer(layerId, map, LeafletLib)
     setCurrentBaseLayer(layerId)
   }
 

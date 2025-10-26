@@ -91,6 +91,17 @@ export function LayersPanel({
           <h4 className="text-md font-medium mb-3 text-slate-700">Camadas Base</h4>
           <div className="grid grid-cols-2 gap-2">
             <IceButton
+              variant={currentBaseLayer === 'coastline' ? 'ice' : 'frost'}
+              size="sm"
+              onClick={() => onChangeBaseLayer('coastline')}
+              className="justify-start gap-2"
+              shineVariant="frost"
+            >
+              <Map className="w-4 h-4" />
+              <span className="text-xs">Linha de Costa</span>
+            </IceButton>
+            
+            <IceButton
               variant={currentBaseLayer === 'osm' ? 'ice' : 'frost'}
               size="sm"
               onClick={() => onChangeBaseLayer('osm')}
