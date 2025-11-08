@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { cn } from '@/lib/utils'
-import { IceButton } from './ice-glass-button'
+import { Button } from '@/components/ui/button'
 import { 
   Map, 
   Satellite, 
@@ -46,23 +46,24 @@ interface InfoPanelProps extends Omit<PanelProps, 'children'> {
 function GlassPanel({ title, children, onClose, className }: PanelProps) {
   return (
     <div className={cn(
-      "absolute top-6 left-48 z-30 w-80",
-      "bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl rounded-2xl",
-      "animate-in slide-in-from-left-2 duration-300",
+      "fixed md:absolute bottom-24 md:bottom-auto md:top-6 left-0 md:left-48 right-0 md:right-auto z-30 w-full md:w-80",
+      "max-h-[60vh] md:max-h-none overflow-y-auto",
+      "bg-white/10 backdrop-blur-xl border-t md:border border-white/20 shadow-2xl rounded-t-2xl md:rounded-2xl",
+      "animate-in slide-in-from-bottom md:slide-in-from-left-2 duration-300",
       className
     )}>
       {/* Glass distortion effects */}
-      <div className="absolute inset-0 bg-gradient-to-br from-white/15 via-transparent to-cyan-100/10 rounded-2xl pointer-events-none" />
-      <div className="absolute inset-0 bg-gradient-to-tr from-blue-100/5 via-transparent to-white/5 rounded-2xl pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-br from-white/15 via-transparent to-cyan-100/10 rounded-t-2xl md:rounded-2xl pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-tr from-blue-100/5 via-transparent to-white/5 rounded-t-2xl md:rounded-2xl pointer-events-none" />
       
       {/* Content */}
-      <div className="relative z-10 p-6">
+      <div className="relative z-10 p-4 md:p-6">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold text-slate-800">{title}</h3>
+        <div className="flex items-center justify-between mb-4 md:mb-6">
+          <h3 className="text-base md:text-lg font-semibold text-white">{title}</h3>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-slate-600 hover:text-slate-800 hover:bg-white/20 transition-colors"
+            className="p-1 rounded-lg text-white hover:text-white hover:bg-white/20 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -90,60 +91,55 @@ export function LayersPanel({
         <div>
           <h4 className="text-md font-medium mb-3 text-slate-700">Camadas Base</h4>
           <div className="grid grid-cols-2 gap-2">
-            <IceButton
-              variant={currentBaseLayer === 'coastline' ? 'ice' : 'frost'}
+            <Button
+              variant={currentBaseLayer === 'coastline' ? 'default' : 'outline'}
               size="sm"
               onClick={() => onChangeBaseLayer('coastline')}
               className="justify-start gap-2"
-              shineVariant="frost"
             >
               <Map className="w-4 h-4" />
               <span className="text-xs">Linha de Costa</span>
-            </IceButton>
+            </Button>
             
-            <IceButton
-              variant={currentBaseLayer === 'osm' ? 'ice' : 'frost'}
+            <Button
+              variant={currentBaseLayer === 'osm' ? 'default' : 'outline'}
               size="sm"
               onClick={() => onChangeBaseLayer('osm')}
               className="justify-start gap-2"
-              shineVariant="frost"
             >
               <Map className="w-4 h-4" />
               <span className="text-xs">OpenStreetMap</span>
-            </IceButton>
+            </Button>
             
-            <IceButton
-              variant={currentBaseLayer === 'satellite' ? 'ice' : 'frost'}
+            <Button
+              variant={currentBaseLayer === 'satellite' ? 'default' : 'outline'}
               size="sm"
               onClick={() => onChangeBaseLayer('satellite')}
               className="justify-start gap-2"
-              shineVariant="frost"
             >
               <Satellite className="w-4 h-4" />
               <span className="text-xs">Satellite</span>
-            </IceButton>
+            </Button>
             
-            <IceButton
-              variant={currentBaseLayer === 'terrain' ? 'ice' : 'frost'}
+            <Button
+              variant={currentBaseLayer === 'terrain' ? 'default' : 'outline'}
               size="sm"
               onClick={() => onChangeBaseLayer('terrain')}
               className="justify-start gap-2"
-              shineVariant="frost"
             >
               <Mountain className="w-4 h-4" />
               <span className="text-xs">Terrain</span>
-            </IceButton>
+            </Button>
             
-            <IceButton
-              variant={currentBaseLayer === 'cartodb' ? 'ice' : 'frost'}
+            <Button
+              variant={currentBaseLayer === 'cartodb' ? 'default' : 'outline'}
               size="sm"
               onClick={() => onChangeBaseLayer('cartodb')}
               className="justify-start gap-2"
-              shineVariant="frost"
             >
               <Globe className="w-4 h-4" />
               <span className="text-xs">Light Theme</span>
-            </IceButton>
+            </Button>
           </div>
         </div>
 
@@ -159,14 +155,14 @@ export function LayersPanel({
                   {photoCount}
                 </span>
               </div>
-              <IceButton
-                variant={showPhotoMarkers ? 'ice' : 'frost'}
+              <Button
+                variant={showPhotoMarkers ? 'default' : 'outline'}
                 size="sm"
                 onClick={onTogglePhotoMarkers}
                 className="px-3"
               >
                 {showPhotoMarkers ? 'ON' : 'OFF'}
-              </IceButton>
+              </Button>
             </div>
           </div>
         </div>
@@ -188,14 +184,13 @@ export function SearchPanel({ title, onClose, searchTerm, onSearchTermChange, on
             className="flex-1 px-3 py-2 bg-white/20 border border-white/30 rounded-lg text-slate-800 placeholder-slate-500 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 transition-all"
             onKeyPress={(e) => e.key === 'Enter' && onSearch()}
           />
-          <IceButton
-            variant="ice"
+          <Button
+            variant="default"
             size="icon"
             onClick={onSearch}
-            shineVariant="crystal"
           >
             <Search className="w-4 h-4" />
-          </IceButton>
+          </Button>
         </div>
         
         <div className="bg-white/10 rounded-xl p-4 border border-white/20">
@@ -235,17 +230,16 @@ export function ExportPanel({ title, onClose, onExport }: ExportPanelProps) {
     <GlassPanel title={title} onClose={onClose}>
       <div className="space-y-2">
         {exportOptions.map((option) => (
-          <IceButton
+          <Button
             key={option.type}
-            variant="frost"
-            size="md"
+            variant="outline"
+            size="default"
             onClick={() => onExport(option.type)}
             className="w-full justify-start gap-3"
-            shineVariant="frost"
           >
             <option.icon className="w-5 h-5" />
             <span>{option.label}</span>
-          </IceButton>
+          </Button>
         ))}
       </div>
     </GlassPanel>
