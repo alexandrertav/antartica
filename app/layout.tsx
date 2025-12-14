@@ -31,6 +31,35 @@ const instrumentSerif = Instrument_Serif({
 
 export const metadata: Metadata = {
   title: "Mapa Interativo - Ilha Rei George",
+  description: "Mapa interativo com fotografias georreferenciadas e dados geomorfológicos da Ilha Rei George, Antártica.",
+  icons: {
+    icon: [
+      { url: "/assets/logo.png", sizes: "32x32", type: "image/png" },
+      { url: "/assets/logo.png", sizes: "16x16", type: "image/png" },
+    ],
+    apple: [
+      { url: "/assets/logo.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
+  openGraph: {
+    title: "Mapa Interativo - Ilha Rei George",
+    description: "Mapa interativo com fotografias georreferenciadas e dados geomorfológicos da Ilha Rei George, Antártica.",
+    images: [
+      {
+        url: "/assets/logo.png",
+        width: 4080,
+        height: 2295,
+        alt: "WebMapa Antártica",
+      },
+    ],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Mapa Interativo - Ilha Rei George",
+    description: "Mapa interativo com fotografias georreferenciadas e dados geomorfológicos da Ilha Rei George, Antártica.",
+    images: ["/assets/logo.png"],
+  },
 }
 
 export default function RootLayout({
