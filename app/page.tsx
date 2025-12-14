@@ -6,7 +6,6 @@ import { ShinyButton } from "@/components/ui/shiny-button"
 import { Feature } from "@/components/ui/feature-with-advantages"
 import { AboutQuote } from "@/components/ui/about-quote"
 import { MailIcon, Camera, Users, Code, TrendingUp, Check } from "lucide-react"
-import { cn } from "@/lib/utils"
 import { useEffect, useRef } from "react"
 import Link from "next/link"
 import Image from "next/image"
@@ -203,16 +202,6 @@ export default function Home() {
           className="relative min-w-full snap-start overflow-y-auto px-4 pt-24 pb-20 [&::-webkit-scrollbar]:hidden"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
-          <div
-            aria-hidden="true"
-            className={cn(
-              "absolute inset-0 z-0 size-full pointer-events-none",
-              "bg-[radial-gradient(rgba(255,255,255,0.1)_1px,transparent_1px)]",
-              "bg-[size:12px_12px]",
-              "opacity-30",
-            )}
-          />
-
           <div className="relative z-10 mx-auto w-full max-w-6xl">
             {/* Project Cards Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
@@ -371,16 +360,6 @@ export default function Home() {
           className="relative min-w-full snap-start overflow-y-auto px-4 pt-24 pb-20 [&::-webkit-scrollbar]:hidden"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
-          <div
-            aria-hidden="true"
-            className={cn(
-              "absolute inset-0 z-0 size-full pointer-events-none",
-              "bg-[radial-gradient(rgba(255,255,255,0.1)_1px,transparent_1px)]",
-              "bg-[size:12px_12px]",
-              "opacity-30",
-            )}
-          />
-
           <div className="relative z-10 mx-auto w-full max-w-7xl mt-[5vh]">
             <div className="mx-auto mb-10 max-w-2xl text-center">
               <h1 className="text-4xl font-extrabold tracking-tight lg:text-6xl text-white [text-shadow:_0_4px_20px_rgb(0_0_0_/_60%)] font-open-sans-custom">
@@ -399,16 +378,6 @@ export default function Home() {
           ref={contactSectionRef}
           className="relative min-w-full snap-start overflow-y-auto px-4 pt-24 pb-20"
         >
-          <div
-            aria-hidden="true"
-            className={cn(
-              "absolute inset-0 z-0 size-full pointer-events-none",
-              "bg-[radial-gradient(rgba(255,255,255,0.1)_1px,transparent_1px)]",
-              "bg-[size:12px_12px]",
-              "opacity-30",
-            )}
-          />
-
           <div className="relative z-10 mx-auto w-full max-w-4xl mt-[5vh]">
             <div className="text-center mb-12">
               <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 font-open-sans-custom [text-shadow:_0_4px_20px_rgb(0_0_0_/_60%)]">
