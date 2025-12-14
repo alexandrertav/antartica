@@ -4,12 +4,12 @@ import { LiquidMetalBackground } from "@/components/liquid-metal-background"
 import { FloatingNavbar } from "@/components/floating-navbar"
 import { ShinyButton } from "@/components/ui/shiny-button"
 import { Feature } from "@/components/ui/feature-with-advantages"
-import { AboutQuote } from "@/components/ui/about-quote"
 import { MailIcon, Camera, Users, Code, TrendingUp, Check } from "lucide-react"
 import { useEffect, useRef } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { SplittingText } from "@/components/text/splitting-text"
+import { CardEquipe } from "@/components/ui/card-equipe"
 
 export default function Home() {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
@@ -369,7 +369,7 @@ export default function Home() {
                 Conheça os pesquisadores responsáveis por tornar este projeto uma realidade.
               </p>
             </div>
-            <AboutQuote />
+            <CardEquipe />
           </div>
         </section>
 
