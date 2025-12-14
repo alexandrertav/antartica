@@ -2,7 +2,7 @@ import { LiquidMetalBackground } from "@/components/liquid-metal-background"
 import { FloatingNavbar } from "@/components/floating-navbar"
 import { Feature } from "@/components/ui/feature-with-advantages"
 
-export default function FeaturesPage() {
+export default function FuncionalidadesPage() {
   return (
     <main className="relative min-h-screen">
       <LiquidMetalBackground />

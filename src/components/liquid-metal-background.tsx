@@ -93,7 +93,7 @@ export function LiquidMetalBackground() {
       ctx.fillStyle = skyGradient
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-      if (!isDaytime) {
+     /* if (!isDaytime) {
         auroraWaves.forEach((wave, index) => {
           const gradient = ctx.createLinearGradient(0, canvas.height * 0.2, 0, canvas.height * 0.5)
 
@@ -113,7 +113,6 @@ export function LiquidMetalBackground() {
             gradient.addColorStop(0.5, "rgba(200, 240, 80, 0.18)")
             gradient.addColorStop(1, "rgba(180, 200, 60, 0)")
           }
-
           ctx.fillStyle = gradient
           ctx.beginPath()
           ctx.moveTo(0, canvas.height * 0.5)
@@ -132,6 +131,7 @@ export function LiquidMetalBackground() {
           ctx.fill()
         })
       }
+*/
 
       if (!isDaytime) {
         for (let i = 0; i < 400; i++) {

@@ -4,7 +4,7 @@ import { Camera, Users, Code, TrendingUp, Check } from "lucide-react"
 import Image from "next/image"
 import { SplittingText } from "@/components/text/splitting-text"
 
-export default function PricingPage() {
+export default function ProjetoPage() {
   return (
     <main className="relative min-h-screen">
       <LiquidMetalBackground />
