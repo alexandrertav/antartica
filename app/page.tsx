@@ -397,7 +397,7 @@ export default function Home() {
             {/* Links e Ações */}
             <div className="flex flex-col md:flex-row items-center justify-center gap-6 mb-12">
               <a
-                href="https://github.com/seu-usuario/seu-repositorio"
+                href="https://github.com/alexandrertav/antartica"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 px-6 py-3 bg-white/10 hover:bg-white/20 border-2 border-white/20 rounded-xl transition-all duration-300 backdrop-blur-sm"
@@ -440,9 +440,6 @@ export default function Home() {
               </p>
               <p className="text-sm text-white/60 font-open-sans-custom">
                 Projeto de pesquisa: Avaliação e gestão de dados geomorfológicos da Ilha Rei George, Antártica Marítima
-              </p>
-              <p className="text-sm text-white/50 font-open-sans-custom italic">
-                Desenvolvido com ❤️ para a ciência
               </p>
             </div>
           </div>
